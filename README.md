@@ -76,6 +76,6 @@ GraalVM as a Java runtime.
 >  Workshop that builds upon the containerisation workshop. It adds:  
 > 
 >  - An introduction to some of the capabilities of the Oracle Cloud Infrastructure (OCI) always free tier.
->  - Showw how using [GraalVM Native Image](https://docs.oracle.com/en/graalvm/enterprise/22/docs/reference-manual/native-image/) can help you make the most of your free tier allocation
+>  - Show how using [GraalVM Native Image](https://docs.oracle.com/en/graalvm/enterprise/22/docs/reference-manual/native-image/) can help you make the most of your free tier allocation
 
 
