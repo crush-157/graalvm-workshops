@@ -154,9 +154,7 @@ The lab then shows how to containerise the application, using Docker. First, tak
 
 The source code and build scripts for this application are in _native-image/containerisation/lab/src_.
 
-The application is built on top of the [Spring Boot](https://spring.io/projects/spring-boot) framework and makes use
-of the [Spring Native Project](https://docs.spring.io/spring-native/docs/current/reference/htmlsingle/) (a Spring incubator
-to generate native executables using GraalVM Native Image).
+The application is built on top of the [Spring Boot](https://spring.io/projects/spring-boot) framework and uses the [GraalVM Native image Support](https://docs.spring.io/spring-boot/docs/current/reference/html/native-image.html) introduced in Spring Boot 3.0.
 
 The application has three classes:
 
@@ -209,37 +207,20 @@ public String generate() {
 Take a little while to view the code and to get acquainted with it.
 
 To build the application, you are going to use Maven. The _pom.xml_ file was generated using [Spring Initializr](https://start.spring.io)
-and contains support to use the Spring Native tooling. This is a dependency that you must add to your Spring Boot projects
-if you plan to target GraalVM Native Image. If you are using Maven, adding support for Spring Native will insert the following
-plugin to your default build configuration.
+and with GraalVM Native Support selected as a dependency.  This adds the following plugin:
 
 ```xml
-<plugin>
-    <groupId>org.springframework.experimental</groupId>
-    <artifactId>spring-aot-maven-plugin</artifactId>
-    <version>${spring-native.version}</version>
-    <executions>
-        <execution>
-            <id>test-generate</id>
-            <goals>
-                <goal>test-generate</goal>
-            </goals>
-        </execution>
-        <execution>
-            <id>generate</id>
-            <goals>
-                <goal>generate</goal>
-            </goals>
-        </execution>
-    </executions>
-</plugin>
+      <plugin>
+        <groupId>org.graalvm.buildtools</groupId>
+        <artifactId>native-maven-plugin</artifactId>
+      </plugin>
 ```
 
 Build your application: from the root directory of the repository, run the following commands in your terminal:
 
 ![](images/RMIL_Technology_Laptop_Bark_RGB_50.png#input)
 ```bash
-cd native-image/containerisation/lab
+cd native-image/non-fungible-verses/lab
 ./mvnw clean package
 ```
 
@@ -249,7 +230,7 @@ file. You can run this JAR file and then use `curl` to call the application's en
 ![](images/RMIL_Technology_Laptop_Bark_RGB_50.png#input)
 ```bash
 # Run the application in the background
-java -jar ./target/jibber-0.0.1-SNAPSHOT-exec.jar &
+java -jar ./target/verses-0.0.1-SNAPSHOT-exec.jar &
 ```
 
 ![](images/RMIL_Technology_Laptop_Bark_RGB_50.png#input)
@@ -378,68 +359,13 @@ is going to exhibit two interesting characteristics, namely:
 1. It is going to start really fast
 2. It will use fewer resources than its corresponding Java application
 
-You can use the native image tooling installed with GraalVM to build a native executable of an
-application from the command line, but as you are using Maven already, you are going to use the 
-[GraalVM Native Build Tools for Maven](https://graalvm.github.io/native-build-tools/latest/maven-plugin.html) which will
-conveniently allow you to carry on using maven.
-
-One way of adding support for building a native executable is to use a Maven [profile](https://maven.apache.org/guides/introduction/introduction-to-profiles.html), 
-which will allow you to decide whether you want to build the JAR file or the native executable. 
-
-The Maven _pom.xml_ file contains a profile that builds a native executable.
-Take a closer look:
-
-The profile is declared and given a name.
-
-```xml
-<profiles>
-    <profile>
-        <id>native</id>
-        <!-- Rest of profile hidden, to highlight relevant parts -->
-    </profile>
-</profiles>
-```
-
-Next, within the profile, the GraalVM Native Image build tools plugin is included and attached to the `package` phase in Maven.
-This means it will run as a part of the `package` phase. Notice that you can pass configuration options and parameters to the underlying Native Image
-build tool using the `<buildArgs>` section. In individual `buildArg` tags you can pass in parameters in exactly the same way
-as you do to the `native-image` tool, so you can use all of the parameters that the `native-image` tool accepts:
-
-```xml
-<build>
-    <plugins>
-        <plugin>
-            <groupId>org.graalvm.buildtools</groupId>
-            <artifactId>native-maven-plugin</artifactId>
-            <version>${native-buildtools.version}</version>
-            <extensions>true</extensions>
-            <executions>
-                <execution>
-                    <id>build-native</id>
-                    <phase>package</phase>
-                    <goals>
-                        <goal>build</goal>
-                    </goals>
-                </execution>
-            </executions>
-            <configuration>
-                <imageName>jibber</imageName>
-                <buildArgs>
-                    <buildArg>-H:+ReportExceptionStackTraces</buildArg>
-                </buildArgs>
-            </configuration>
-        </plugin>
-        <!-- Rest of profile hidden, to highlight relevant parts -->
-    </plugins>
-</build>
-```
-
-Now run the Maven build using the profile, as below (note that the profile name is specified with the `-P` flag):
+Run the following command to build the native executable:
 
 ![](images/RMIL_Technology_Laptop_Bark_RGB_50.png#input)
 ```bash
-./mvnw package -Pnative
+./mvnw package -Pnative native:compile
 ```
+The `-Pnative` refers to the `native` profile inherited from `spring-boot-starter-parent` in the _pom.xml_.
 <!-- Should we tell the user to ignore the warnings here ^^? -->
 
 This will generate a native executable in the _target_ directory, named _jibber_. Take a 

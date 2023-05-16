@@ -52,6 +52,15 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+				    <!-- podman configuration -->
+					<!-- (comment out if using docker) -->
+				    <docker>
+                        <host>unix:///run/user/1000/podman/podman.sock</host>
+                        <bindHostToBuilder>true</bindHostToBuilder>
+                    </docker>
+					<!-- podman configuration ends -->
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>
