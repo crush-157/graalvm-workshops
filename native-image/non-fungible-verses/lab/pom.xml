@@ -65,4 +65,27 @@
 		</plugins>
 	</build>
 
+	<!-- mostly-static -->
+	<!-- (statically links everthing except libc) -->
+	<!-- good for use with "distroless" container images -->
+	<profiles>
+	    <profile>
+		    <id>mostly-static</id>
+			<build>
+			    <plugins>
+				    <plugin>
+        				<groupId>org.graalvm.buildtools</groupId>
+		        		<artifactId>native-maven-plugin</artifactId>
+						<configuration>
+						    <buildArgs>
+							    <buildArg>-H:+StaticExecutableWithDynamicLibC</buildArg>
+                                <buildArg>-H:+ReportExceptionStackTraces</buildArg>
+							</buildArgs>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+
 </project>
