@@ -76,12 +76,27 @@
 				    <plugin>
         				<groupId>org.graalvm.buildtools</groupId>
 		        		<artifactId>native-maven-plugin</artifactId>
+						<extensions>true</extensions>
+						<executions>
+						    <execution>
+							    <id>build-native</id>
+								<phase>package</phase>
+								<goals>
+								    <goal>compile-no-fork</goal>
+								</goals>
+							</execution>
+						</executions>
 						<configuration>
+						    <imageName>static-verses</imageName>
 						    <buildArgs>
 							    <buildArg>-H:+StaticExecutableWithDynamicLibC</buildArg>
                                 <buildArg>-H:+ReportExceptionStackTraces</buildArg>
 							</buildArgs>
 						</configuration>
+					</plugin>
+					<plugin>
+				        <groupId>org.springframework.boot</groupId>
+				        <artifactId>spring-boot-maven-plugin</artifactId>
 					</plugin>
 				</plugins>
 			</build>
