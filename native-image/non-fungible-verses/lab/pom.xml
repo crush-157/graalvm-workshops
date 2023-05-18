@@ -48,6 +48,13 @@
 			<plugin>
 				<groupId>org.graalvm.buildtools</groupId>
 				<artifactId>native-maven-plugin</artifactId>
+				<configuration>
+				    <buildArgs>
+						<!-- for "mostly static" build -->
+					    <buildArg>-H:+StaticExecutableWithDynamicLibC</buildArg>
+                        <buildArg>-H:+ReportExceptionStackTraces</buildArg>
+					</buildArgs>
+				</configuration>
 			</plugin>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
