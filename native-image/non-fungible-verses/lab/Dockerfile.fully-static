@@ -1,0 +1,25 @@
+FROM ghcr.io/graalvm/graalvm-ce:22.3.2 as build-setup
+WORKDIR /tools
+RUN microdnf install -y wget
+RUN wget http://more.musl.cc/10/x86_64-linux-musl/x86_64-linux-musl-native.tgz
+RUN tar -xzf x86_64-linux-musl-native.tgz
+RUN wget https://zlib.net/zlib-1.2.13.tar.gz
+RUN tar -xzf zlib-1.2.13.tar.gz
+RUN rm *.tgz
+ENV TOOLCHAIN_DIR=/tools/x86_64-linux-musl-native
+ENV CC=$TOOLCHAIN_DIR/bin/gcc
+WORKDIR /tools/zlib-1.2.13
+RUN ./configure --prefix=$TOOLCHAIN_DIR --static
+RUN make install
+ENV PATH=$TOOLCHAIN_DIR/bin:$PATH
+WORKDIR /build
+COPY src ./src
+COPY .mvn ./.mvn
+COPY fully-static-pom.xml mvnw ./
+
+FROM build-setup as builder
+RUN ./mvnw --file fully-static-pom.xml --no-transfer-progress -Pnative native:compile
+
+FROM gcr.io/distroless/base AS distroless
+COPY --from=builder /build/target/verses /app/
+ENTRYPOINT ["/app/verses"]

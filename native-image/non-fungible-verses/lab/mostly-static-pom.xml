@@ -50,60 +50,16 @@
 				<artifactId>native-maven-plugin</artifactId>
 				<configuration>
 				    <buildArgs>
+						<!-- for "mostly static" build -->
+					    <buildArg>-H:+StaticExecutableWithDynamicLibC</buildArg>
+                        <buildArg>-H:+ReportExceptionStackTraces</buildArg>
 					</buildArgs>
 				</configuration>
 			</plugin>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
-                <configuration>
-				    <!-- podman configuration for buildpacks -->
-					<!-- (comment out if using docker) -->
-				    <docker>
-                        <host>unix:///run/user/1000/podman/podman.sock</host>
-                        <bindHostToBuilder>true</bindHostToBuilder>
-                    </docker>
-					<!-- podman configuration ends -->
-				</configuration>
 			</plugin>
 		</plugins>
 	</build>
-
-	<!-- mostly-static -->
-	<!-- (statically links everthing except libc) -->
-	<!-- good for use with "distroless" container images -->
-	<profiles>
-	    <profile>
-		    <id>mostly-static</id>
-			<build>
-			    <plugins>
-				    <plugin>
-        				<groupId>org.graalvm.buildtools</groupId>
-		        		<artifactId>native-maven-plugin</artifactId>
-						<extensions>true</extensions>
-						<executions>
-						    <execution>
-							    <id>build-native</id>
-								<phase>package</phase>
-								<goals>
-								    <goal>compile-no-fork</goal>
-								</goals>
-							</execution>
-						</executions>
-						<configuration>
-						    <buildArgs>
-							    <buildArg>-H:+StaticExecutableWithDynamicLibC</buildArg>
-                                <buildArg>-H:+ReportExceptionStackTraces</buildArg>
-							</buildArgs>
-						</configuration>
-					</plugin>
-					<plugin>
-				        <groupId>org.springframework.boot</groupId>
-				        <artifactId>spring-boot-maven-plugin</artifactId>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-	</profiles>
-
 </project>

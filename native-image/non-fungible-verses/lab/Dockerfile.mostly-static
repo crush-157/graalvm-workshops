@@ -1,0 +1,12 @@
+FROM debian:11 as build-box
+RUN apt-get update && apt-get upgrade -y && apt-get install -y build-essential zlib1g-dev
+COPY --from=ghcr.io/graalvm/graalvm-ce:22.3.2 /opt/graalvm-ce-java17-22.3.2 /opt/graalvm
+COPY . /build
+WORKDIR /build
+ENV JAVA_HOME=/opt/graalvm
+ENV PATH=${JAVA_HOME}/bin:$PATH
+RUN ./mvnw --file mostly-static-pom.xml --no-transfer-progress -Pnative native:compile
+
+FROM gcr.io/distroless/base-debian11 AS distroless
+COPY --from=build-box /build/target/verses .
+ENTRYPOINT ["/verses"]
