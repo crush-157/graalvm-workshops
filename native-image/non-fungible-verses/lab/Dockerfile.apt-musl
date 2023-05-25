@@ -1,15 +1,15 @@
 FROM debian:11 as build-setup
-RUN apt-get update && apt-get upgrade -y && apt-get install -y build-essential zlib1g-dev
+RUN apt-get update && apt-get upgrade -y && apt-get install -y build-essential zlib1g-dev musl-tools
 COPY --from=ghcr.io/graalvm/graalvm-ce:22.3.2 /opt/graalvm-ce-java17-22.3.2 /opt/graalvm
 WORKDIR /build
 COPY src src/
 COPY .mvn .mvn/
-COPY mostly-static-pom.xml mvnw .
+COPY fully-static-pom.xml mvnw .
 ENV JAVA_HOME=/opt/graalvm
 ENV PATH=${JAVA_HOME}/bin:$PATH
 
 FROM build-setup as build
-RUN ./mvnw --file mostly-static-pom.xml --no-transfer-progress -Pnative native:compile
+RUN ./mvnw --file fully-static-pom.xml --no-transfer-progress -Pnative native:compile
 
 FROM gcr.io/distroless/base-debian11 AS distroless
 COPY --from=build /build/target/verses .

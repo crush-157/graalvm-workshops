@@ -13,13 +13,13 @@ RUN ./configure --prefix=$TOOLCHAIN_DIR --static
 RUN make install
 ENV PATH=$TOOLCHAIN_DIR/bin:$PATH
 WORKDIR /build
-COPY src ./src
-COPY .mvn ./.mvn
+COPY src src/
+COPY .mvn .mvn/
 COPY fully-static-pom.xml mvnw ./
 
-FROM build-setup as builder
+FROM build-setup as build
 RUN ./mvnw --file fully-static-pom.xml --no-transfer-progress -Pnative native:compile
 
 FROM gcr.io/distroless/base AS distroless
-COPY --from=builder /build/target/verses /app/
+COPY --from=build /build/target/verses /app/
 ENTRYPOINT ["/app/verses"]
